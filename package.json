@@ -1,0 +1,14 @@
+{
+  "name": "wisa2mqtt",
+  "version": "1.0.0",
+  "description": "MQTT bridge for WiSA SoundSend",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tim van der Staaij",
+  "license": "MIT",
+  "dependencies": {
+    "node-ble": "^1.8.0"
+  }
+}
