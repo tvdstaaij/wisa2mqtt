@@ -9,6 +9,7 @@
   "author": "Tim van der Staaij",
   "license": "MIT",
   "dependencies": {
+    "async-mqtt": "^2.6.3",
     "node-ble": "^1.8.0"
   }
 }
