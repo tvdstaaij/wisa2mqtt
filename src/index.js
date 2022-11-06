@@ -28,7 +28,7 @@ async function handleCommand({key, value}) {
   }
 }
 
-async function main() {
+async function start() {
   const bluetoothAdapter = await bluetooth.defaultAdapter();
   soundSend = new SoundSend(bluetoothAdapter, process.env.SOUNDSEND_ADDRESS);
   mqttBridge = new MqttBridge(process.env.MQTT_URI);
@@ -42,5 +42,14 @@ async function main() {
 
   await mqttBridge.start();
   await soundSend.start();
+}
+
+async function main() {
+  try {
+    await start();
+  } catch (err) {
+    console.log('Fatal error during startup:', err);
+    process.exit(1);
+  }
 }
 main();
