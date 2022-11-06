@@ -30,8 +30,6 @@ class SoundSend extends EventEmitter {
     this._serialCharacteristic = null;
     this._rxBuf = Buffer.from([]);
     this._audioFormat = null;
-
-    setInterval(() => this._sendCommand(MSG_TYPE.READ, DATA_FIELD.AUDIO_FORMAT), 1000);
   }
 
   async start() {
