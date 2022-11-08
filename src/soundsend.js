@@ -30,29 +30,79 @@ class SoundSend extends EventEmitter {
     this._serialCharacteristic = null;
     this._rxBuf = Buffer.from([]);
     this._audioFormat = null;
+    this._audioMode = null;
+    this._audioSource = null;
+    this._volume = null;
+    this._muted = false;
   }
 
   async start() {
     await this._tryConnect();
   }
 
-  async setAudioSource(sourceString) {
-    const sourceId = AUDIO_SOURCE_MAP.indexOf(sourceString.toLowerCase());
-    assert.ok(sourceId >= 0);
-    return this._sendCommand(MSG_TYPE.WRITE, DATA_FIELD.AUDIO_SOURCE, [sourceId]);
-  }
-
   async setVolume(volumePercentage) {
     volumePercentage = Number(volumePercentage);
     assert.ok(volumePercentage === Math.round(volumePercentage));
     assert.ok(volumePercentage >= 0 && volumePercentage <= 100);
-    return this._sendCommand(MSG_TYPE.WRITE, DATA_FIELD.VOLUME, [volumePercentage]);
+    this._volume = volumePercentage;
+    const effectiveVolume = this._muted ? 0 : this._volume;
+    return this._sendCommand(MSG_TYPE.WRITE, DATA_FIELD.VOLUME, [effectiveVolume]);
   }
 
-  async setAudioMode(modeString) {
-    const modeId = AUDIO_MODE_MAP.indexOf(modeString.toLowerCase());
+  async adjustVolume(relativeVolumePercentage) {
+    relativeVolumePercentage = Number(relativeVolumePercentage);
+    assert.ok(this._volume !== null);
+    assert.ok(relativeVolumePercentage === Math.round(relativeVolumePercentage));
+    let newVolume = this._volume + relativeVolumePercentage;
+    if (newVolume < 0) newVolume = 0;
+    if (newVolume > 100) newVolume = 100;
+    return this.setVolume(newVolume);
+  }
+
+  async setMute(muted) {
+    assert.ok(this._volume !== null);
+    this._muted = Boolean(muted);
+    return this.setVolume(this._volume);
+  }
+
+  async toggleMute() {
+    return this.setMute(!this._muted);
+  }
+
+  async setAudioMode(mode) {
+    const mappedModeId = AUDIO_MODE_MAP.indexOf(String(mode).toLowerCase());
+    const modeId = mappedModeId >= 0 ? mappedModeId : Number(mode);
+    assert.ok(modeId === Math.round(modeId));
     assert.ok(modeId >= 0);
+    assert.ok(modeId < AUDIO_MODE_MAP.length);
+    this._audioMode = modeId;
     return this._sendCommand(MSG_TYPE.WRITE, DATA_FIELD.AUDIO_MODE, [modeId]);
+  }
+
+  async cycleAudioMode() {
+    assert.ok(this._audioMode !== null);
+    const nextAudioMode = (this._audioMode + 1) % AUDIO_MODE_MAP.length;
+    return this.setAudioMode(nextAudioMode);
+  }
+
+  async setAudioSource(source) {
+    const mappedSourceId = AUDIO_SOURCE_MAP.indexOf(String(source).toLowerCase());
+    const sourceId = mappedSourceId >= 0 ? mappedSourceId : Number(source);
+    assert.ok(sourceId === Math.round(sourceId));
+    assert.ok(sourceId >= 0);
+    assert.ok(sourceId < AUDIO_SOURCE_MAP.length);
+    this._audioSource = sourceId;
+    return this._sendCommand(MSG_TYPE.WRITE, DATA_FIELD.AUDIO_SOURCE, [sourceId]);
+  }
+
+  async cycleAudioSource() {
+    assert.ok(this._audioSource !== null);
+    const nextAudioSource = (this._audioSource + 1) % AUDIO_SOURCE_MAP.length;
+    return this.setAudioSource(nextAudioSource);
+  }
+
+  async queryAudioFormat() {
+    await this._sendCommand(MSG_TYPE.READ, DATA_FIELD.AUDIO_FORMAT);
   }
 
   async _sendCommand(msgType, dataField, value = []) {
@@ -82,16 +132,25 @@ class SoundSend extends EventEmitter {
   _processResponse(dataField, value) {
     switch (dataField) {
       case DATA_FIELD.VOLUME:
+        if (this._volume === null) {
+          this._volume = value[0];
+        }
         this.emit('propertyChanged', {key: 'volume', value: value[0]});
         break;
       case DATA_FIELD.AUDIO_MODE:
+        if (this._audioMode === null) {
+          this._audioMode = value[0];
+        }
         this.emit('propertyChanged', {key: 'audioMode', value: AUDIO_MODE_MAP[value[0]]});
         break;
       case DATA_FIELD.AUDIO_SOURCE:
+        if (this._audioSource === null) {
+          this._audioSource = value[0];
+        }
         this.emit('propertyChanged', {key: 'audioSource', value: AUDIO_SOURCE_MAP[value[0]]});
         break;
       case DATA_FIELD.AUDIO_FORMAT:
-        if (value.length < 3) break;
+        if (value.length < 2) break;
         const formatString = value.subarray(2).toString('utf8');
         if (this._audioFormat !== formatString) {
           this._audioFormat = formatString;

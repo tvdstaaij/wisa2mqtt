@@ -38,7 +38,7 @@ class MqttBridge extends EventEmitter {
       msg = msg.toString('utf8');
     }
     assert.ok(typeof msg === 'string');
-    this.emit('commandReceived', {key: fragments[2], value: msg});
+    this.emit('commandReceived', {command: fragments[2], arg: msg});
   }
 }
 
