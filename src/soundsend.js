@@ -23,6 +23,7 @@ const AUDIO_SOURCE_MAP = ['arc', 'optical'];
 class SoundSend extends EventEmitter {
   constructor(adapter, deviceAddress) {
     super();
+    this._conn_attempts = 0;
     this.connected = false;
     this._adapter = adapter;
     this._deviceAddress = deviceAddress;
@@ -170,7 +171,8 @@ class SoundSend extends EventEmitter {
 
   async _tryConnect() {
     try {
-      console.log('Connecting to SoundSend');
+      this.emit('connecting', {attempt: ++this._conn_attempts});
+      console.log(`Connecting to SoundSend (attempt ${this._conn_attempts})`);
       const isDiscovering = await this._adapter.isDiscovering();
       if (!isDiscovering) {
         await this._adapter.startDiscovery();
@@ -195,6 +197,7 @@ class SoundSend extends EventEmitter {
       this._serialCharacteristic.on('valuechanged', (buf) => this._processRxData(buf));
       await this._serialCharacteristic.startNotifications();
       if (this._device) {
+        this._conn_attempts = 0;
         console.log('Connected to SoundSend');
         this.connected = true;
         this.emit('connected');

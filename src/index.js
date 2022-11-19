@@ -14,6 +14,12 @@ async function start() {
   soundSend = new SoundSend(bluetoothAdapter, process.env.SOUNDSEND_ADDRESS);
   mqttBridge = new MqttBridge(process.env.MQTT_URI);
 
+  soundSend.on('connecting', ({attempts}) => {
+    if (attempts > 3) {
+      console.log('SoundSend connection attempts exhausted');
+      process.exit(1);
+    }
+  });
   soundSend.on('connected', () => mqttBridge.publishStatus('alive', 'true'));
   soundSend.on('disconnected', () => mqttBridge.publishStatus('alive', 'false'));
   soundSend.on('propertyChanged', ({key, value}) => {
