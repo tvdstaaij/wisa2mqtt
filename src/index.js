@@ -20,13 +20,19 @@ async function start() {
       process.exit(1);
     }
   });
-  soundSend.on('connected', () => mqttBridge.publishStatus('alive', 'true'));
-  soundSend.on('disconnected', () => mqttBridge.publishStatus('alive', 'false'));
+  soundSend.on('connected', () => mqttBridge.publishStatus('alive', true));
+  soundSend.on('disconnected', () => mqttBridge.publishStatus('alive', false));
   soundSend.on('propertyChanged', ({key, value}) => {
     mqttBridge.publishStatus(key.toLowerCase(), value);
   });
   mqttBridge.on('commandReceived', ({command, arg}) => {
     handleCommand(soundSend, command, arg);
+  });
+  mqttBridge.on('connected', () => {
+    // While disconnected from MQTT, the Last Will and Testament will have been
+    // published, so observers will think the device is not alive. Therefore,
+    // always re-publish the device status after (re)connecting to MQTT.
+    mqttBridge.publishStatus('alive', soundSend.connected);
   });
 
   await mqttBridge.start();

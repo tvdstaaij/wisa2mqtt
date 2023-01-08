@@ -19,11 +19,19 @@ class MqttBridge extends EventEmitter {
         payload: 'false',
         retain: true,
       },
+      keepalive: 10,
     });
     console.log('Connected to MQTT broker');
+    this.emit('connected');
     this._client.on('message', (...args) => this._handleMessage(...args));
-    this._client.on('connect', () => console.log('Reconnected to MQTT broker'));
-    this._client.on('offline', () => console.log('Disconnected from MQTT broker'));
+    this._client.on('connect', () => {
+      console.log('Reconnected to MQTT broker');
+      this.emit('connected');
+    });
+    this._client.on('offline', () => {
+      console.log('Disconnected from MQTT broker');
+      this.emit('disconnected');
+    });
     await this._client.subscribe('wisa2mqtt/command/+');
   }
 
