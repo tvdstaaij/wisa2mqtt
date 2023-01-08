@@ -52,18 +52,20 @@ class SoundSend extends EventEmitter {
 
   async adjustVolume(relativeVolumePercentage) {
     relativeVolumePercentage = Number(relativeVolumePercentage);
-    assert.ok(this._volume !== null);
     assert.ok(relativeVolumePercentage === Math.round(relativeVolumePercentage));
-    let newVolume = this._volume + relativeVolumePercentage;
-    if (newVolume < 0) newVolume = 0;
-    if (newVolume > 100) newVolume = 100;
-    return this.setVolume(newVolume);
+    if (this._volume !== null) {
+      let newVolume = this._volume + relativeVolumePercentage;
+      if (newVolume < 0) newVolume = 0;
+      if (newVolume > 100) newVolume = 100;
+      return this.setVolume(newVolume);
+    }
   }
 
   async setMute(muted) {
-    assert.ok(this._volume !== null);
-    this._muted = Boolean(muted);
-    return this.setVolume(this._volume);
+    if (this._volume !== null) {
+      this._muted = Boolean(muted);
+      return this.setVolume(this._volume);
+    }
   }
 
   async toggleMute() {
@@ -81,9 +83,10 @@ class SoundSend extends EventEmitter {
   }
 
   async cycleAudioMode() {
-    assert.ok(this._audioMode !== null);
-    const nextAudioMode = (this._audioMode + 1) % AUDIO_MODE_MAP.length;
-    return this.setAudioMode(nextAudioMode);
+    if (this._audioMode !== null) {
+      const nextAudioMode = (this._audioMode + 1) % AUDIO_MODE_MAP.length;
+      return this.setAudioMode(nextAudioMode);
+    }
   }
 
   async setAudioSource(source) {
@@ -97,9 +100,10 @@ class SoundSend extends EventEmitter {
   }
 
   async cycleAudioSource() {
-    assert.ok(this._audioSource !== null);
-    const nextAudioSource = (this._audioSource + 1) % AUDIO_SOURCE_MAP.length;
-    return this.setAudioSource(nextAudioSource);
+    if (this._audioSource !== null) {
+      const nextAudioSource = (this._audioSource + 1) % AUDIO_SOURCE_MAP.length;
+      return this.setAudioSource(nextAudioSource);
+    }
   }
 
   async queryAudioFormat() {
