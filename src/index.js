@@ -37,6 +37,7 @@ async function start() {
 
   await mqttBridge.start();
   await soundSend.start();
+  setInterval(() => soundSend.queryAudioFormat(), 5000);
 }
 
 async function main() {

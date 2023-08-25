@@ -34,9 +34,6 @@ async function handleCommand(soundSend, command, arg) {
       case 'togglemute':
         await soundSend.toggleMute();
         break;
-      case 'getaudioformat':
-        await soundSend.queryAudioFormat();
-        break;
       default:
         throw new Error('Unknown command');
     }

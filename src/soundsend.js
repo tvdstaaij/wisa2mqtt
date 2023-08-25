@@ -4,7 +4,7 @@ const assert = require('assert');
 const {EventEmitter} = require('events');
 
 const SERIAL_SERVICE_UUID = '97ded94c-b564-48ab-ba96-7e1d2daa0edd';
-const SERIAL_CHARACTERISTIC_UUID = 'a4a8d442-b8d0-404c-a0fb-f120115acf5e'
+const SERIAL_CHARACTERISTIC_UUID = 'a4a8d442-b8d0-404c-a0fb-f120115acf5e';
 
 const MSG_TYPE = {
   READ: 0,
@@ -19,6 +19,14 @@ const DATA_FIELD = {
 };
 const AUDIO_MODE_MAP = ['direct', 'movie', 'music', 'night'];
 const AUDIO_SOURCE_MAP = ['arc', 'optical'];
+const AUDIO_FORMAT_MAP = {
+  'no signal': 'none',
+  'multi-ch pcm': 'pcm',
+  'dolby digital': 'ac3',
+  'dolby digital p': 'eac3',
+  'dolby truehd': 'truehd',
+  'dolby atmos (do': 'atmos',
+};
 
 class SoundSend extends EventEmitter {
   constructor(adapter, deviceAddress) {
@@ -156,10 +164,15 @@ class SoundSend extends EventEmitter {
         break;
       case DATA_FIELD.AUDIO_FORMAT:
         if (value.length < 2) break;
-        const formatString = value.subarray(2).toString('utf8');
-        if (this._audioFormat !== formatString) {
-          this._audioFormat = formatString;
-          this.emit('propertyChanged', {key: 'audioFormat', value: formatString});
+        const rawFormat = value.subarray(2).toString('utf8');
+        // It seems the SoundSend transmits this in chunks of 15 bytes/characters.
+        // Since the first 15 chars are sufficient to identify the format,
+        // simply trim to 15 and ignore everything that is not recognized.
+        const trimmedFormat = rawFormat.substring(0, 15);
+        const mappedFormat = AUDIO_FORMAT_MAP[trimmedFormat.toLowerCase()];
+        if (mappedFormat && this._audioFormat !== mappedFormat) {
+          this._audioFormat = mappedFormat;
+          this.emit('propertyChanged', {key: 'audioFormat', value: mappedFormat});
         }
         break;
       default:
