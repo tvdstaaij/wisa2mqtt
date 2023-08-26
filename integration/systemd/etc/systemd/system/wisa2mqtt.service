@@ -1,0 +1,18 @@
+[Unit]
+Description=WiSA SoundSend MQTT bridge
+Wants=network-online.target bluetooth.target
+After=network-online.target bluetooth.target
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/wisa2mqtt.env
+ExecStart=/usr/bin/node /path/to/wisa2mqtt
+User=wisa2mqtt
+WorkingDirectory=/path/to/wisa2mqtt
+StandardOutput=journal
+StandardError=journal
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,40 @@
+number:
+  - unique_id: soundsend_volume
+    name: SoundSend volume
+    state_topic: "wisa2mqtt/status/volume"
+    command_topic: "wisa2mqtt/command/setvolume"
+    availability: !include inc/soundsend_availability.yaml
+    mode: slider
+    min: 0
+    max: 100
+    unit_of_measurement: "%"
+    icon: "mdi:volume-high"
+
+select:
+  - unique_id: soundsend_audio_mode
+    name: SoundSend mode
+    state_topic: "wisa2mqtt/status/audiomode"
+    command_topic: "wisa2mqtt/command/setaudiomode"
+    availability: !include inc/soundsend_availability.yaml
+    options:
+      - direct
+      - movie
+      - music
+      - night
+    icon: "mdi:music"
+  - unique_id: soundsend_audio_source
+    name: SoundSend source
+    state_topic: "wisa2mqtt/status/audiosource"
+    command_topic: "wisa2mqtt/command/setaudiosource"
+    availability: !include inc/soundsend_availability.yaml
+    options:
+      - arc
+      - optical
+    icon: "mdi:connection"
+
+sensor:
+  - unique_id: soundsend_audio_format
+    name: SoundSend audio format
+    state_topic: "wisa2mqtt/status/audioformat"
+    availability: !include inc/soundsend_availability.yaml
+    icon: "mdi:audio-input-stereo-minijack"

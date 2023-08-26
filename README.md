@@ -47,41 +47,26 @@ to the prefix `wisa2mqtt/command/+`.
 
 ### Command topics
 
+Commands with payload:
+
 * `setsource`: set the audio source to `arc` or `optical`.
-* `nextsource`: cycle to the next available audio source.
 * `setvolume`: set volume to the given level (0-100).
 * `volumeup`: increase volume by the given amount (clipping at 100).
 * `volumedown`: decrease volume by the given amount (clipping at 0).
 * `setaudiomode`: set DSP mode to `direct`, `movie`, `music` or `night`.
-* `nextsource`: cycle to the next available DSP mode.
+
+Commands that ignore payload:
+
+* `nextsource`: cycle to the next available audio source.
 * `mute`: set volume to 0 until unmuted.
 * `unmute`: restore volume to the original level before muting.
 * `togglemute`: mute if unmuted, unmute if muted.
+* `nextaudiomode`: cycle to the next available DSP mode.
 
-## Example systemd service
+## Integrations
 
-You could run wisa2mqtt as a systemd service, for example:
-
-```
-[Unit]
-Description=WiSA SoundSend MQTT bridge
-Wants=network-online.target bluetooth.target
-After=network-online.target bluetooth.target
-
-[Service]
-Type=simple
-EnvironmentFile=/etc/wisa2mqtt.env # Put required env vars in this file
-ExecStart=/usr/bin/node /path/to/wisa2mqtt
-User=wisa2mqtt
-WorkingDirectory=/path/to/wisa2mqtt
-StandardOutput=journal
-StandardError=journal
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
-```
+See the `integration` directory for examples of how to run wisa2mqtt using
+systemd, and how to integrate it with Home Assistant and triggerhappy.
 
 ## Disclaimer
 
