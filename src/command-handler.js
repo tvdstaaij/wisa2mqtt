@@ -1,7 +1,6 @@
 'use strict';
 
 async function handleCommand(soundSend, command, arg) {
-  console.log('Received command:', {command, arg});
   try {
     switch (command) {
       case 'setsource':

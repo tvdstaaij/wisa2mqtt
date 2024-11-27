@@ -7,12 +7,34 @@ const SoundSend = require('./soundsend.js');
 const handleCommand = require('./command-handler.js');
 
 const {bluetooth} = createBluetooth();
-let soundSend, mqttBridge;
 
 async function start() {
   const bluetoothAdapter = await bluetooth.defaultAdapter();
-  soundSend = new SoundSend(bluetoothAdapter, process.env.SOUNDSEND_ADDRESS);
-  mqttBridge = new MqttBridge(process.env.MQTT_URI);
+  const soundSend = new SoundSend(bluetoothAdapter, process.env.SOUNDSEND_ADDRESS);
+
+  const mqttBridges = [];
+  const mqttConnectionPromises = [];
+  for (const [key, value] of Object.entries(process.env)) {
+    if (key.startsWith('MQTT_URI')) {
+      let name = key.substring(8);
+      if (name.startsWith('_')) {
+        name = name.substring(1);
+      }
+      let bridge = new MqttBridge(name, value);
+      bridge.on('commandReceived', ({command, arg}) => {
+        handleCommand(soundSend, command, arg);
+      });
+      bridge.on('connected', () => {
+        // While disconnected from MQTT, the Last Will and Testament will have been
+        // published, so observers will think the device is not alive. Therefore,
+        // always re-publish the device status after (re)connecting to MQTT.
+        bridge.publishStatus('alive', soundSend.connected);
+      });
+      mqttBridges.push(bridge);
+      mqttConnectionPromises.push(bridge.start());
+    }
+  }
+  await Promise.all(mqttConnectionPromises);
 
   soundSend.on('connecting', ({attempt}) => {
     if (attempt > 3) {
@@ -20,23 +42,17 @@ async function start() {
       process.exit(1);
     }
   });
-  soundSend.on('connected', () => mqttBridge.publishStatus('alive', true));
-  soundSend.on('disconnected', () => mqttBridge.publishStatus('alive', false));
-  soundSend.on('propertyChanged', ({key, value}) => {
-    mqttBridge.publishStatus(key.toLowerCase(), value);
-  });
-  mqttBridge.on('commandReceived', ({command, arg}) => {
-    handleCommand(soundSend, command, arg);
-  });
-  mqttBridge.on('connected', () => {
-    // While disconnected from MQTT, the Last Will and Testament will have been
-    // published, so observers will think the device is not alive. Therefore,
-    // always re-publish the device status after (re)connecting to MQTT.
-    mqttBridge.publishStatus('alive', soundSend.connected);
-  });
-
-  await mqttBridge.start();
+  soundSend.on('connected', () => mqttBridges.forEach((bridge) => {
+    bridge.publishStatus('alive', true);
+  }));
+  soundSend.on('disconnected', () => mqttBridges.forEach((bridge) => {
+    bridge.publishStatus('alive', false);
+  }));
+  soundSend.on('propertyChanged', ({key, value}) => mqttBridges.forEach((bridge) => {
+    bridge.publishStatus(key.toLowerCase(), value);
+  }));
   await soundSend.start();
+
   setInterval(() => soundSend.queryAudioFormat(), 5000);
 }
 

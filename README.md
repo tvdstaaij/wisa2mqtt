@@ -27,6 +27,12 @@ Set the following environment variables:
 
 Then, simply run `node .` in this directory.
 
+### Advanced: multiple brokers
+
+Use multiple MQTT environment variables with different suffixes
+(e.g. `MQTT_URI_A`, `MQTT_URI_B`) to connect to all of them. Status updates
+will be published to all brokers, and commands are accepted from any broker.
+
 ## MQTT interface
 
 wisa2mqtt publishes on the topic prefix `wisa2mqtt/status/+` and subscribes

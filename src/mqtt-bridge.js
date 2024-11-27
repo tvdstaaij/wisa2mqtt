@@ -5,8 +5,9 @@ const Mqtt = require('async-mqtt');
 const {EventEmitter} = require('events');
 
 class MqttBridge extends EventEmitter {
-  constructor(uri) {
+  constructor(name, uri) {
     super();
+    this._name = name;
     this._uri = uri;
     this._client = null;
   }
@@ -21,15 +22,15 @@ class MqttBridge extends EventEmitter {
       },
       keepalive: 10,
     });
-    console.log('Connected to MQTT broker');
+    console.log(`Connected to MQTT broker ${this._name}`);
     this.emit('connected');
     this._client.on('message', (...args) => this._handleMessage(...args));
     this._client.on('connect', () => {
-      console.log('Reconnected to MQTT broker');
+      console.log(`Reconnected to MQTT broker ${this._name}`);
       this.emit('connected');
     });
     this._client.on('offline', () => {
-      console.log('Disconnected from MQTT broker');
+      console.log(`Disconnected from MQTT broker ${this._name}`);
       this.emit('disconnected');
     });
     await this._client.subscribe('wisa2mqtt/command/+');
@@ -46,7 +47,9 @@ class MqttBridge extends EventEmitter {
       msg = msg.toString('utf8');
     }
     assert.ok(typeof msg === 'string');
-    this.emit('commandReceived', {command: fragments[2], arg: msg});
+    let eventData = {command: fragments[2], arg: msg};
+    console.log(`Received command through broker ${this._name}:`, eventData);
+    this.emit('commandReceived', eventData);
   }
 }
 
