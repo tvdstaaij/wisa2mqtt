@@ -1,5 +1,6 @@
 number:
   - unique_id: soundsend_volume
+    device: !include inc/soundsend_device.yaml
     name: SoundSend volume
     state_topic: "wisa2mqtt/status/volume"
     command_topic: "wisa2mqtt/command/setvolume"
@@ -12,6 +13,7 @@ number:
 
 select:
   - unique_id: soundsend_audio_mode
+    device: !include inc/soundsend_device.yaml
     name: SoundSend mode
     state_topic: "wisa2mqtt/status/audiomode"
     command_topic: "wisa2mqtt/command/setaudiomode"
@@ -23,6 +25,7 @@ select:
       - night
     icon: "mdi:music"
   - unique_id: soundsend_audio_source
+    device: !include inc/soundsend_device.yaml
     name: SoundSend source
     state_topic: "wisa2mqtt/status/audiosource"
     command_topic: "wisa2mqtt/command/setaudiosource"
@@ -34,6 +37,7 @@ select:
 
 sensor:
   - unique_id: soundsend_audio_format
+    device: !include inc/soundsend_device.yaml
     name: SoundSend audio format
     state_topic: "wisa2mqtt/status/audioformat"
     availability: !include inc/soundsend_availability.yaml
