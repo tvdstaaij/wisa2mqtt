@@ -118,6 +118,12 @@ class SoundSend extends EventEmitter {
     await this._sendCommand(MSG_TYPE.READ, DATA_FIELD.AUDIO_FORMAT);
   }
 
+  async readSettings() {
+    await this._sendCommand(MSG_TYPE.READ, DATA_FIELD.VOLUME);
+    await this._sendCommand(MSG_TYPE.READ, DATA_FIELD.AUDIO_MODE);
+    await this._sendCommand(MSG_TYPE.READ, DATA_FIELD.AUDIO_SOURCE);
+  }
+
   async _sendCommand(msgType, dataField, value = []) {
     if (this.connected) {
       const header = [msgType, dataField, value.length];
@@ -180,12 +186,6 @@ class SoundSend extends EventEmitter {
     }
   }
 
-  async _readSettings() {
-    await this._sendCommand(MSG_TYPE.READ, DATA_FIELD.VOLUME);
-    await this._sendCommand(MSG_TYPE.READ, DATA_FIELD.AUDIO_MODE);
-    await this._sendCommand(MSG_TYPE.READ, DATA_FIELD.AUDIO_SOURCE);
-  }
-
   async _tryConnect() {
     try {
       this.emit('connecting', {attempt: ++this._conn_attempts});
@@ -218,7 +218,7 @@ class SoundSend extends EventEmitter {
         console.log('Connected to SoundSend');
         this.connected = true;
         this.emit('connected');
-        this._readSettings();
+        this.readSettings();
       }
     } catch (e) {
       if (e && e.type && e.type == 'org.bluez.Error.Failed') {

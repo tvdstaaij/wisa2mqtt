@@ -5,6 +5,7 @@ const {createBluetooth} = require('node-ble');
 const MqttBridge = require('./mqtt-bridge.js');
 const SoundSend = require('./soundsend.js');
 const handleCommand = require('./command-handler.js');
+const {retryPromise} = require('./utils.js');
 
 const {bluetooth} = createBluetooth();
 
@@ -20,6 +21,7 @@ async function start() {
       if (name.startsWith('_')) {
         name = name.substring(1);
       }
+
       let bridge = new MqttBridge(name, value);
       bridge.on('commandReceived', ({command, arg}) => {
         handleCommand(soundSend, command, arg);
@@ -29,22 +31,36 @@ async function start() {
         // published, so observers will think the device is not alive. Therefore,
         // always re-publish the device status after (re)connecting to MQTT.
         bridge.publishStatus('alive', soundSend.connected);
+        // Also force query the SoundSend settings so that they are immediately published.
+        soundSend.readSettings();
       });
       mqttBridges.push(bridge);
-      const connectionPromise = bridge.start().catch((err) => {
-        console.log(`Failed to connect to MQTT broker ${name}:`, err);
-        throw err;
-      });
+
+      const connectionPromise = retryPromise(() => {
+        return bridge.start().catch((err) => {
+          console.log(`Failed to connect to MQTT broker ${name}:`, err);
+          throw err;
+        });
+      }, 1000, 60000);
       mqttConnectionPromises.push(connectionPromise);
     }
   }
 
-  await Promise.allSettled(mqttConnectionPromises);
   try {
-    await Promise.any(mqttConnectionPromises);
+    await Promise.race([
+      Promise.any(mqttConnectionPromises),
+      new Promise((resolve, reject) => setTimeout(reject, 10000)),
+    ]);
   } catch (err) {
-    throw Error('Could not connect to any broker');
+    throw Error('Could not connect to any broker within 10 seconds');
   }
+
+  // Wait until connected to all brokers if possible, but move on if this
+  // doesn't happen within 10 seconds.
+  await Promise.race([
+    Promise.all(mqttConnectionPromises),
+    new Promise((resolve) => setTimeout(resolve, 10000)),
+  ]);
 
   soundSend.on('connecting', ({attempt}) => {
     if (attempt > 3) {
