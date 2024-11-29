@@ -37,6 +37,7 @@ class MqttBridge extends EventEmitter {
   }
 
   async publishStatus(key, value) {
+    if (!this._client) return;
     await this._client.publish(`wisa2mqtt/status/${key}`, String(value), {retain: true});
   }
 

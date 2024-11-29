@@ -31,10 +31,20 @@ async function start() {
         bridge.publishStatus('alive', soundSend.connected);
       });
       mqttBridges.push(bridge);
-      mqttConnectionPromises.push(bridge.start());
+      const connectionPromise = bridge.start().catch((err) => {
+        console.log(`Failed to connect to MQTT broker ${name}:`, err);
+        throw err;
+      });
+      mqttConnectionPromises.push(connectionPromise);
     }
   }
-  await Promise.all(mqttConnectionPromises);
+
+  await Promise.allSettled(mqttConnectionPromises);
+  try {
+    await Promise.any(mqttConnectionPromises);
+  } catch (err) {
+    throw Error('Could not connect to any broker');
+  }
 
   soundSend.on('connecting', ({attempt}) => {
     if (attempt > 3) {
