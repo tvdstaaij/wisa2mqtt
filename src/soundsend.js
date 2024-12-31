@@ -189,7 +189,7 @@ class SoundSend extends EventEmitter {
   async _tryConnect() {
     try {
       this.emit('connecting', {attempt: ++this._conn_attempts});
-      console.log(`Connecting to SoundSend (attempt ${this._conn_attempts})`);
+      console.log(`Connecting to SoundSend ${this._deviceAddress} (attempt ${this._conn_attempts})`);
       const isDiscovering = await this._adapter.isDiscovering();
       if (!isDiscovering) {
         await this._adapter.startDiscovery();
