@@ -10,6 +10,10 @@ const {retryPromise} = require('./utils.js');
 const {bluetooth} = createBluetooth();
 
 async function start() {
+  if (!process.env.SOUNDSEND_ADDRESS) {
+    throw Error('Environment variable SOUNDSEND_ADDRESS is not set');
+  }
+
   const bluetoothAdapter = await bluetooth.defaultAdapter();
   const soundSend = new SoundSend(bluetoothAdapter, process.env.SOUNDSEND_ADDRESS);
 
@@ -44,6 +48,10 @@ async function start() {
       }, 1000, 60000);
       mqttConnectionPromises.push(connectionPromise);
     }
+  }
+
+  if (!mqttConnectionPromises.length) {
+    throw Error('Environment variable MQTT_URI is not set');
   }
 
   try {
