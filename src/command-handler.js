@@ -33,6 +33,30 @@ async function handleCommand(soundSend, command, arg) {
       case 'togglemute':
         await soundSend.toggleMute();
         break;
+      case 'setpower':
+        if (arg.toLowerCase() === "true") {
+          await soundSend.setPower(true);
+        } else if (arg.toLowerCase() === "false") {
+          await soundSend.setPower(false);
+        } else {
+          throw new Error("Invalid payload for setpower");
+        }
+        break;
+      case 'togglepower':
+        await soundSend.togglePower();
+        break;
+      case 'setbassmanagement':
+      if (arg.toLowerCase() === "true") {
+        await soundSend.setBassManagement(true);
+      } else if (arg.toLowerCase() === "false") {
+        await soundSend.setBassManagement(false);
+      } else {
+        throw new Error("Invalid payload for setbassmanagement");
+      }
+        break;
+      case 'togglebassmanagement':
+        await soundSend.toggleBassManagement();
+        break;
       default:
         throw new Error('Unknown command');
     }

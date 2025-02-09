@@ -42,3 +42,23 @@ sensor:
     state_topic: "wisa2mqtt/status/audioformat"
     availability: !include inc/soundsend_availability.yaml
     icon: "mdi:audio-input-stereo-minijack"
+
+switch:
+  - unique_id: soundsend_power
+    name: SoundSend power
+    state_topic: "wisa2mqtt/status/power"
+    command_topic: "wisa2mqtt/command/setpower"
+    payload_on: "true"
+    payload_off: "false"
+    availability: !include inc/soundsend_availability.yaml
+    device: !include inc/soundsend_device.yaml
+    icon: "mdi:power"
+  - unique_id: soundsend_bassmanagement
+    name: SoundSend bass management
+    state_topic: "wisa2mqtt/status/bassmanagement"
+    command_topic: "wisa2mqtt/command/setbassmanagement"
+    payload_on: "true"
+    payload_off: "false"
+    availability: !include inc/soundsend_availability.yaml
+    device: !include inc/soundsend_device.yaml
+    icon: "mdi:volume-vibrate"

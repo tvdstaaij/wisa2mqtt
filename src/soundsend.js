@@ -14,8 +14,10 @@ const MSG_TYPE = {
 const DATA_FIELD = {
   VOLUME: 4,
   AUDIO_SOURCE: 5,
+  POWER: 6,
   AUDIO_MODE: 9,
   AUDIO_FORMAT: 54,
+  BASS_MANAGEMENT: 56,
 };
 const AUDIO_MODE_MAP = ['direct', 'movie', 'music', 'night'];
 const AUDIO_SOURCE_MAP = ['arc', 'optical'];
@@ -43,6 +45,8 @@ class SoundSend extends EventEmitter {
     this._audioSource = null;
     this._volume = null;
     this._muted = false;
+    this._power = null;
+    this._bass_management = null;
   }
 
   async start() {
@@ -78,6 +82,28 @@ class SoundSend extends EventEmitter {
 
   async toggleMute() {
     return this.setMute(!this._muted);
+  }
+
+  async setPower(enabled) {
+    this._power = enabled;
+    return this._sendCommand(MSG_TYPE.WRITE, DATA_FIELD.POWER, [Number(enabled)]);
+  }
+
+  async togglePower() {
+    if (this._power !== null) {
+      return this.setPower(!this._power);
+    }
+  }
+
+  async setBassManagement(enabled) {
+    this._bass_management = enabled;
+    return this._sendCommand(MSG_TYPE.WRITE, DATA_FIELD.BASS_MANAGEMENT, [Number(enabled)]);
+  }
+
+  async toggleBassManagement() {
+    if (this._bass_management !== null) {
+      return this.setBassManagement(!this._bass_management);
+    }
   }
 
   async setAudioMode(mode) {
@@ -122,6 +148,8 @@ class SoundSend extends EventEmitter {
     await this._sendCommand(MSG_TYPE.READ, DATA_FIELD.VOLUME);
     await this._sendCommand(MSG_TYPE.READ, DATA_FIELD.AUDIO_MODE);
     await this._sendCommand(MSG_TYPE.READ, DATA_FIELD.AUDIO_SOURCE);
+    await this._sendCommand(MSG_TYPE.READ, DATA_FIELD.POWER);
+    await this._sendCommand(MSG_TYPE.READ, DATA_FIELD.BASS_MANAGEMENT);
   }
 
   async _sendCommand(msgType, dataField, value = []) {
@@ -167,6 +195,18 @@ class SoundSend extends EventEmitter {
           this._audioSource = value[0];
         }
         this.emit('propertyChanged', {key: 'audioSource', value: AUDIO_SOURCE_MAP[value[0]]});
+        break;
+      case DATA_FIELD.POWER:
+        if (this._power === null) {
+          this._power = Boolean(value[0]);
+        }
+        this.emit('propertyChanged', {key: 'power', value: Boolean(value[0])});
+        break;
+      case DATA_FIELD.BASS_MANAGEMENT:
+        if (this._bass_management === null) {
+          this._bass_management = Boolean(value[0]);
+        }
+        this.emit('propertyChanged', {key: 'bassManagement', value: Boolean(value[0])});
         break;
       case DATA_FIELD.AUDIO_FORMAT:
         if (value.length < 2) break;

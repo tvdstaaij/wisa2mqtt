@@ -50,6 +50,8 @@ to the prefix `wisa2mqtt/command/+`.
 * `audioformat`: audio codec detected by the SoundSend, either `none`, `pcm`,
   `ac3`, `eac3`, `truehd` or `atmos`. Update interval is can vary in practice,
   but should be at least a couple of times per minute.
+* `power`: `true` when SoundSend is in power-on mode, `false` when in standby mode
+* `bassmanagement`: `true` when [bass management][1] feature is on, `false` when off
 
 ### Command topics
 
@@ -60,6 +62,8 @@ Commands with payload:
 * `volumeup`: increase volume by the given amount (clipping at 100).
 * `volumedown`: decrease volume by the given amount (clipping at 0).
 * `setaudiomode`: set DSP mode to `direct`, `movie`, `music` or `night`.
+* `setpower`: `true` to power on, `false` to enter standby
+* `setbassmanagement`: `true` to turn on [bass management][1] feature, `false` to turn off
 
 Commands that ignore payload:
 
@@ -68,6 +72,10 @@ Commands that ignore payload:
 * `unmute`: restore volume to the original level before muting.
 * `togglemute`: mute if unmuted, unmute if muted.
 * `nextaudiomode`: cycle to the next available DSP mode.
+* `togglepower`: switch between power-on and standby
+* `togglebassmanagement`: toggle [bass management][1] feature
+
+[1]: https://support.wisatechnologies.com/hc/en-us/articles/5334448143131-Bass-Management
 
 ## Integrations
 
