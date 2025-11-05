@@ -25,6 +25,11 @@ Set the following environment variables:
 * `SOUNDSEND_ADDRESS`: BLE device address of your SoundSend in
   `AA:BB:CC:DD:EE:FF` notation. Find this using a BLE scanning app.
 
+And optionally:
+
+* `BLUETOOTH_ADAPTER`: Name of specific Bluetooth adapter to use,
+  for example `hci0`.
+
 Then, simply run `node .` in this directory.
 
 ### Advanced: multiple brokers

@@ -14,7 +14,14 @@ async function start() {
     throw Error('Environment variable SOUNDSEND_ADDRESS is not set');
   }
 
-  const bluetoothAdapter = await bluetooth.defaultAdapter();
+  let bluetoothAdapter = null;
+  if (process.env.BLUETOOTH_ADAPTER) {
+    console.log(`Using bluetooth adapter ${process.env.BLUETOOTH_ADAPTER}`);
+    bluetoothAdapter = await bluetooth.getAdapter(process.env.BLUETOOTH_ADAPTER);
+  } else {
+    bluetoothAdapter = await bluetooth.defaultAdapter();
+  }
+
   const soundSend = new SoundSend(bluetoothAdapter, process.env.SOUNDSEND_ADDRESS);
 
   const mqttBridges = [];
