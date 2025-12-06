@@ -22,12 +22,18 @@ const DATA_FIELD = {
 const AUDIO_MODE_MAP = ['direct', 'movie', 'music', 'night'];
 const AUDIO_SOURCE_MAP = ['arc', 'optical'];
 const AUDIO_FORMAT_MAP = {
-  'no signal': 'none',
-  'multi-ch pcm': 'pcm',
-  'dolby digital': 'ac3',
-  'dolby digital p': 'eac3',
-  'dolby truehd': 'truehd',
-  'dolby atmos (do': 'atmos',
+  'no signal':       'No Signal',
+  'multi-ch pcm':     'PCM Multi-Ch',
+  'pcm 2/0':          "PCM 2/0",
+  'dolby digital':    'Dolby AC-3',
+  'dolby digital p':  'Enhanced AC-3',
+  'dolby truehd':     'True HD',
+  'dolby atmos (do':  'Atmos',
+  '(pcm 2/0)':        'Dolby Sorround (PCM 2/0)',
+  'dolby surro':      'Dolby Sorround (PCM 2/0)',
+  '(pcm 5/1)':        'Dolby Sorround (PCM 5/1)',
+  '(dolby digital ':   'Enhanced AC-3',
+  '(Dolby Digital)':   'Dolby AC-3'
 };
 
 class SoundSend extends EventEmitter {
