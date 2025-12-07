@@ -10,6 +10,61 @@ number:
     max: 100
     unit_of_measurement: "%"
     icon: "mdi:volume-high"
+    
+  - unique_id: soundsend_eq_high
+    device: !include inc/soundsend_device.yaml
+    name: SoundSend EQ High
+    state_topic: "wisa2mqtt/status/eq_high"
+    command_topic: "wisa2mqtt/command/setEqHigh"
+    availability: !include inc/soundsend_availability.yaml
+    mode: slider
+    min: -6
+    max: 6
+    icon: "mdi:equalizer"
+
+  - unique_id: soundsend_eq_midrange
+    device: !include inc/soundsend_device.yaml
+    name: SoundSend EQ Mid-Range
+    state_topic: "wisa2mqtt/status/eq_midrange"
+    command_topic: "wisa2mqtt/command/setEqMidrange"
+    availability: !include inc/soundsend_availability.yaml
+    mode: slider
+    min: -6
+    max: 6
+    icon: "mdi:equalizer"
+
+  - unique_id: soundsend_eq_voice
+    device: !include inc/soundsend_device.yaml
+    name: SoundSend EQ Voice
+    state_topic: "wisa2mqtt/status/eq_voice"
+    command_topic: "wisa2mqtt/command/setEqVoice"
+    availability: !include inc/soundsend_availability.yaml
+    mode: slider
+    min: -6
+    max: 6
+    icon: "mdi:equalizer"
+
+  - unique_id: soundsend_eq_midbass
+    device: !include inc/soundsend_device.yaml
+    name: SoundSend EQ Mid-Bass
+    state_topic: "wisa2mqtt/status/eq_midbass"
+    command_topic: "wisa2mqtt/command/setEqMidbass"
+    availability: !include inc/soundsend_availability.yaml
+    mode: slider
+    min: -6
+    max: 6
+    icon: "mdi:equalizer"
+
+  - unique_id: soundsend_eq_subbass
+    device: !include inc/soundsend_device.yaml
+    name: SoundSend EQ Sub-Bass
+    state_topic: "wisa2mqtt/status/eq_subbass"
+    command_topic: "wisa2mqtt/command/setEqSubbass"
+    availability: !include inc/soundsend_availability.yaml
+    mode: slider
+    min: -6
+    max: 6
+    icon: "mdi:equalizer"
 
 select:
   - unique_id: soundsend_audio_mode
