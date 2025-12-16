@@ -271,23 +271,18 @@ class SoundSend extends EventEmitter {
         }
         break;
       case DATA_FIELD.EQ_HIGH:
-        console.log('EQ_HIGH value:', makeIntFromSignedByte(value[0]));
         this.emit('propertyChanged', {key: 'eqHigh', 'value': makeIntFromSignedByte(value[0])});
         break;
       case DATA_FIELD.EQ_MIDRANGE:
-        console.log('EQ_MIDRANGE value:', makeIntFromSignedByte(value[0]));
         this.emit('propertyChanged', {key: 'eqMidrange', 'value': makeIntFromSignedByte(value[0])});
         break;
       case DATA_FIELD.EQ_VOICE:
-        console.log('EQ_VOICE value:', makeIntFromSignedByte(value[0]));
         this.emit('propertyChanged', {key: 'eqVoice', 'value': makeIntFromSignedByte(value[0])});
         break;
       case DATA_FIELD.EQ_MIDBASS:
-        console.log('EQ_MIDBASS value:', makeIntFromSignedByte(value[0]));
         this.emit('propertyChanged', {key: 'eqMidbass', 'value': makeIntFromSignedByte(value[0])});
         break;
       case DATA_FIELD.EQ_SUBBASS:
-        console.log('EQ_SUBBASS value:', makeIntFromSignedByte(value[0]));
         this.emit('propertyChanged', {key: 'eqSubbass', 'value': makeIntFromSignedByte(value[0])});
         break;
       default:

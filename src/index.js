@@ -89,9 +89,12 @@ async function start() {
   soundSend.on('disconnected', () => mqttBridges.forEach((bridge) => {
     bridge.publishStatus('alive', false);
   }));
-  soundSend.on('propertyChanged', ({key, value}) => mqttBridges.forEach((bridge) => {
-    bridge.publishStatus(key.toLowerCase(), value);
-  }));
+  soundSend.on('propertyChanged', ({key, value}) => {
+    console.log(`propertyChanged: ${key} => ${value}`);
+    mqttBridges.forEach((bridge) => {
+      bridge.publishStatus(key.toLowerCase(), value);
+    });
+  });
   await soundSend.start();
 
   setInterval(() => soundSend.queryAudioFormat(), 5000);
