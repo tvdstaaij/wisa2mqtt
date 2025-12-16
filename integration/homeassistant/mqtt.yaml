@@ -10,56 +10,51 @@ number:
     max: 100
     unit_of_measurement: "%"
     icon: "mdi:volume-high"
-    
   - unique_id: soundsend_eq_high
     device: !include inc/soundsend_device.yaml
     name: SoundSend EQ High
-    state_topic: "wisa2mqtt/status/eq_high"
-    command_topic: "wisa2mqtt/command/setEqHigh"
+    state_topic: "wisa2mqtt/status/eqhigh"
+    command_topic: "wisa2mqtt/command/seteqhigh"
     availability: !include inc/soundsend_availability.yaml
     mode: slider
     min: -6
     max: 6
     icon: "mdi:equalizer"
-
   - unique_id: soundsend_eq_midrange
     device: !include inc/soundsend_device.yaml
     name: SoundSend EQ Mid-Range
-    state_topic: "wisa2mqtt/status/eq_midrange"
-    command_topic: "wisa2mqtt/command/setEqMidrange"
+    state_topic: "wisa2mqtt/status/eqmidrange"
+    command_topic: "wisa2mqtt/command/seteqmidrange"
     availability: !include inc/soundsend_availability.yaml
     mode: slider
     min: -6
     max: 6
     icon: "mdi:equalizer"
-
   - unique_id: soundsend_eq_voice
     device: !include inc/soundsend_device.yaml
     name: SoundSend EQ Voice
-    state_topic: "wisa2mqtt/status/eq_voice"
-    command_topic: "wisa2mqtt/command/setEqVoice"
+    state_topic: "wisa2mqtt/status/eqvoice"
+    command_topic: "wisa2mqtt/command/seteqvoice"
     availability: !include inc/soundsend_availability.yaml
     mode: slider
     min: -6
     max: 6
     icon: "mdi:equalizer"
-
   - unique_id: soundsend_eq_midbass
     device: !include inc/soundsend_device.yaml
     name: SoundSend EQ Mid-Bass
-    state_topic: "wisa2mqtt/status/eq_midbass"
-    command_topic: "wisa2mqtt/command/setEqMidbass"
+    state_topic: "wisa2mqtt/status/eqmidbass"
+    command_topic: "wisa2mqtt/command/seteqmidbass"
     availability: !include inc/soundsend_availability.yaml
     mode: slider
     min: -6
     max: 6
     icon: "mdi:equalizer"
-
   - unique_id: soundsend_eq_subbass
     device: !include inc/soundsend_device.yaml
     name: SoundSend EQ Sub-Bass
-    state_topic: "wisa2mqtt/status/eq_subbass"
-    command_topic: "wisa2mqtt/command/setEqSubbass"
+    state_topic: "wisa2mqtt/status/eqsubbass"
+    command_topic: "wisa2mqtt/command/seteqsubbass"
     availability: !include inc/soundsend_availability.yaml
     mode: slider
     min: -6

@@ -52,11 +52,13 @@ to the prefix `wisa2mqtt/command/+`.
 * `audiomode`: current DSP mode setting, either
   `direct`, `movie`, `music` or `night`.
 * `audiosource`: current audio source setting, either `arc` or `optical`.
-* `audioformat`: audio codec detected by the SoundSend, either `none`, `pcm`,
-  `ac3`, `eac3`, `truehd` or `atmos`. Update interval is can vary in practice,
-  but should be at least a couple of times per minute.
+* `audioformat`: audio codec detected by the SoundSend, see `AUDIO_FORMAT_MAP`
+  values in `src/soundsend.js`. Update interval can vary in practice, but should
+  be at least a couple of times per minute.
 * `power`: `true` when SoundSend is in power-on mode, `false` when in standby mode
 * `bassmanagement`: `true` when [bass management][1] feature is on, `false` when off
+* `eqhigh`, `eqmidrange`, `eqvoice`, `eqmidbass`, `eqsubbass`: equalizer gains,
+  in the range of -6 to 6.
 
 ### Command topics
 
@@ -69,6 +71,8 @@ Commands with payload:
 * `setaudiomode`: set DSP mode to `direct`, `movie`, `music` or `night`.
 * `setpower`: `true` to power on, `false` to enter standby
 * `setbassmanagement`: `true` to turn on [bass management][1] feature, `false` to turn off
+* `seteqhigh`, `seteqmidrange`, `seteqvoice`, `seteqmidbass`, `seteqsubbass`: set
+  equalizer gain (-6 to 6).
 
 Commands that ignore payload:
 

@@ -57,22 +57,21 @@ async function handleCommand(soundSend, command, arg) {
       case 'togglebassmanagement':
         await soundSend.toggleBassManagement();
         break;
-
-      case 'setEqHigh':
+      case 'seteqhigh':
         await soundSend.setEqHigh(arg);
         break;
-      case 'setEqSubbass':
+      case 'seteqsubbass':
         await soundSend.setEqSubbass(arg);
         break;
-      case 'setEqVoice':
+      case 'seteqvoice':
         await soundSend.setEqVoice(arg);
         break;
-      case 'setEqMidrange':
+      case 'seteqmidrange':
         await soundSend.setEqMidrange(arg);
         break;
-      case 'setEqMidbass':
+      case 'seteqmidbass':
         await soundSend.setEqMidbass(arg);
-        break;        
+        break;
       default:
         throw new Error('Unknown command');
     }
