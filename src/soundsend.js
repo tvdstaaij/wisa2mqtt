@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const {EventEmitter} = require('events');
-const { mapEqGainToByte, mapByteToEqGain } = require('./utils.js');
+const {makeSignedByteFromInt, makeIntFromSignedByte} = require('./utils.js');
 
 const SERIAL_SERVICE_UUID = '97ded94c-b564-48ab-ba96-7e1d2daa0edd';
 const SERIAL_CHARACTERISTIC_UUID = 'a4a8d442-b8d0-404c-a0fb-f120115acf5e';
@@ -59,56 +59,35 @@ class SoundSend extends EventEmitter {
     this._muted = false;
     this._power = null;
     this._bass_management = null;
-    this._eq_high = null;
-    this._eq_midrange = null;
-    this._eq_voice = null;
-    this._eq_midbass = null;
-    this._eq_subbass = null;
   }
 
   async start() {
     await this._tryConnect();
   }
 
-async setEqHigh(gain) {
-    const gain_value = mapEqGainToByte(gain);
-    const dataField = DATA_FIELD.EQ_HIGH;
-    this._eq_high = gain;
-    this.emit('propertyChanged', {key: 'eq_high', 'value': this._eq_high});
-    return this._sendCommand(MSG_TYPE.WRITE, dataField, [gain_value]);
+  async setEqHigh(gain) {
+    const gainByte = this._mapEqGainToByte(gain);
+    return this._sendCommand(MSG_TYPE.WRITE, DATA_FIELD.EQ_HIGH, [gainByte]);
   }
+
   async setEqVoice(gain) {
-    const gain_value = mapEqGainToByte(Number(gain));
-    this._eq_voice = gain;
-    this.emit('propertyChanged', {key: 'eq_voice', 'value': this._eq_voice});
-    const dataField = DATA_FIELD.EQ_VOICE;
-    return this._sendCommand(MSG_TYPE.WRITE, dataField, [gain_value]);
+    const gainByte = this._mapEqGainToByte(gain);
+    return this._sendCommand(MSG_TYPE.WRITE, DATA_FIELD.EQ_VOICE, [gainByte]);
   }
 
   async setEqMidrange(gain) {
-    const gain_value = mapEqGainToByte(Number(gain));
-    this._eq_midrange = gain;
-
-    this.emit('propertyChanged', {key: 'eq_midrange', 'value': this._eq_midrange});
-    const dataField = DATA_FIELD.EQ_MIDRANGE;
-    return this._sendCommand(MSG_TYPE.WRITE, dataField, [gain_value]);
+    const gainByte = this._mapEqGainToByte(gain);
+    return this._sendCommand(MSG_TYPE.WRITE, DATA_FIELD.EQ_MIDRANGE, [gainByte]);
   }
 
   async setEqMidbass(gain) {
-    gain = Number(gain);
-    const gain_value = mapEqGainToByte(Number(gain));
-    this._eq_midbass = gain;
-    this.emit('propertyChanged', {key: 'eq_midbass', 'value': this._eq_midbass});
-    const dataField = DATA_FIELD.EQ_MIDBASS;
-    return this._sendCommand(MSG_TYPE.WRITE, dataField, [gain_value]);
+    const gainByte = this._mapEqGainToByte(gain);
+    return this._sendCommand(MSG_TYPE.WRITE, DATA_FIELD.EQ_MIDBASS, [gainByte]);
   }
 
   async setEqSubbass(gain) {
-    const gain_value = mapEqGainToByte(Number(gain));
-    this._eq_subbass = gain;
-    this.emit('propertyChanged', {key: 'eq_subbass', 'value': this._eq_subbass});
-    const dataField = DATA_FIELD.EQ_SUBBASS;
-    return this._sendCommand(MSG_TYPE.WRITE, dataField, [gain_value]);
+    const gainByte = this._mapEqGainToByte(gain);
+    return this._sendCommand(MSG_TYPE.WRITE, DATA_FIELD.EQ_SUBBASS, [gainByte]);
   }
   
   async setVolume(volumePercentage) {
@@ -215,6 +194,13 @@ async setEqHigh(gain) {
     await this._sendCommand(MSG_TYPE.READ, DATA_FIELD.EQ_HIGH);
   }
 
+  _mapEqGainToByte(gain) {
+    gain = Number(gain);
+    assert.ok(gain === Math.round(gain));
+    assert.ok(gain >= -6 && gain <= 6);
+    return makeSignedByteFromInt(gain);
+  }
+
   async _sendCommand(msgType, dataField, value = []) {
     if (this.connected) {
       const header = [msgType, dataField, value.length];
@@ -285,42 +271,25 @@ async setEqHigh(gain) {
         }
         break;
       case DATA_FIELD.EQ_HIGH:
-            if (this._eq_high === null) {
-              this._eq_high = mapByteToEqGain(value[0])
-              console.log('EQ_HIGH value:', value[0], mapByteToEqGain(value[0]));
-            }
-            this.emit('propertyChanged', {key: 'eq_high', 'value': this._eq_high});
-          break;
+        console.log('EQ_HIGH value:', makeIntFromSignedByte(value[0]));
+        this.emit('propertyChanged', {key: 'eqHigh', 'value': makeIntFromSignedByte(value[0])});
+        break;
       case DATA_FIELD.EQ_MIDRANGE:
-            if (this._eq_midrange === null) {
-              this._eq_midrange = mapByteToEqGain(value[0])
-              console.log('EQ_MIDRANGE value:', value[0], mapByteToEqGain(value[0]));
-            }
-            this.emit('propertyChanged', {key: 'eq_midrange', 'value': this._eq_midrange});
-          break;
-    
+        console.log('EQ_MIDRANGE value:', makeIntFromSignedByte(value[0]));
+        this.emit('propertyChanged', {key: 'eqMidrange', 'value': makeIntFromSignedByte(value[0])});
+        break;
       case DATA_FIELD.EQ_VOICE:
-            if (this._eq_voice === null) {
-              this._eq_voice = value[0]
-              console.log('EQ_VOICE value:', value[1], value[0]);
-            }
-            this.emit('propertyChanged', {key: 'eq_voice', 'value': this._eq_voice});
-          break;
+        console.log('EQ_VOICE value:', makeIntFromSignedByte(value[0]));
+        this.emit('propertyChanged', {key: 'eqVoice', 'value': makeIntFromSignedByte(value[0])});
+        break;
       case DATA_FIELD.EQ_MIDBASS:
-            if (this._eq_midbass === null) {
-              this._eq_midbass = mapByteToEqGain(value[0])
-            }
-            console.log('EQ_MIDBASS value:', value[0], mapByteToEqGain(value[0]));
-            this.emit('propertyChanged', {key: 'eq_midbass', 'value': this._eq_midbass});
-          break;
-
+        console.log('EQ_MIDBASS value:', makeIntFromSignedByte(value[0]));
+        this.emit('propertyChanged', {key: 'eqMidbass', 'value': makeIntFromSignedByte(value[0])});
+        break;
       case DATA_FIELD.EQ_SUBBASS:
-            if (this._eq_subbass === null) {
-              this._eq_subbass = mapByteToEqGain(value[0])
-            }
-             console.log('EQ_SUBBASS value:', value[0], mapByteToEqGain(value[0]));
-            this.emit('propertyChanged', {key: 'eq_subbass', 'value': this._eq_subbass});
-          break;
+        console.log('EQ_SUBBASS value:', makeIntFromSignedByte(value[0]));
+        this.emit('propertyChanged', {key: 'eqSubbass', 'value': makeIntFromSignedByte(value[0])});
+        break;
       default:
         console.log(`Unknown response for data field ${dataField} (value=${value})`);
     }
